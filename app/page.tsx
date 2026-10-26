@@ -33,7 +33,7 @@ const nav=[['dashboard','ダッシュボード',LayoutDashboard],['import','発�
 
 export default function Home(){
  const [store,setStore]=useState<Store>(emptyStore()),[ready,setReady]=useState(false),[section,setSection]=useState<string>('receiving'),[menu,setMenu]=useState(false),[qrOpen,setQrOpen]=useState(false),[message,setMessage]=useState('');
- const [filters,setFilters]=useState<Filters>({supplier:'',itemCode:'',itemName:'',destination:'',orderNumber:''}),[searched,setSearched]=useState(false),[selectedIds,setSelectedIds]=useState<number[]>([]);
+ const [filters,setFilters]=useState<Filters>({supplier:'',itemCode:'',itemName:'',destination:'',orderNumber:''}),[searched,setSearched]=useState(true),[selectedIds,setSelectedIds]=useState<number[]>([]);
  const [flow,setFlow]=useState<'list'|'edit'|'confirm'>('list'),[receiver,setReceiver]=useState('プロトタイプ利用者'),[receivedAt,setReceivedAt]=useState(localDateTime()),[bulkDestination,setBulkDestination]=useState(''),[bulkLocation,setBulkLocation]=useState(''),[drafts,setDrafts]=useState<Record<number,Draft>>({});
  const [csvRows,setCsvRows]=useState<CsvRow[]>([]),[csvName,setCsvName]=useState(''),[locationInput,setLocationInput]=useState(''),[historyQuery,setHistoryQuery]=useState('');
  const [editingReceipt,setEditingReceipt]=useState<Receipt|null>(null),[receiptAction,setReceiptAction]=useState<'delete'|'return'|''>(''),[receiptEditStep,setReceiptEditStep]=useState<'select'|'confirm'>('select');
