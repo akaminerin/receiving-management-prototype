@@ -1,4 +1,3 @@
-Attempting to perform the InitializeDefaultDrives operation on the 'FileSystem' provider failed.
 "use client";
 import {useEffect,useMemo,useState} from "react";
 import {Archive,CheckCircle2,ChevronLeft,FileDown,FileUp,LayoutDashboard,Menu,PackageCheck,Plus,QrCode,Search,Truck,UserRound,X} from "lucide-react";
