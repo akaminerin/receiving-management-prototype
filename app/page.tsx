@@ -1,4 +1,3 @@
-Attempting to perform the InitializeDefaultDrives operation on the 'FileSystem' provider failed.
 "use client";
 import {useEffect,useMemo,useState} from "react";
 import {Archive,CheckCircle2,ChevronLeft,FileDown,FileUp,LayoutDashboard,Menu,PackageCheck,Plus,QrCode,Search,Truck,UserRound,X} from "lucide-react";
@@ -122,4 +121,3 @@ function Badge({children,tone='amber'}:{children:React.ReactNode;tone?:string}){
 function Empty({text}:{text:string}){return <div className="empty"><Archive size={28}/><p>{text}</p></div>}
 function Detail({k,v}:{k:string;v:string|number}){return <div className="detail"><span>{k}</span><strong>{v}</strong></div>}
 function DataTable({head,rows}:{head:string[];rows:(string|number)[][]}){return <div className="table-wrap"><table><thead><tr>{head.map(h=><th key={h}>{h}</th>)}</tr></thead><tbody>{rows.map((r,i)=><tr key={i}>{r.map((c,j)=><td key={j}>{c}</td>)}</tr>)}</tbody></table></div>}
-

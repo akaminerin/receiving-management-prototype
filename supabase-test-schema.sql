@@ -1,4 +1,3 @@
-Attempting to perform the InitializeDefaultDrives operation on the 'FileSystem' provider failed.
 -- 入荷管理プロトタイプ用・共有データ保存テーブル
 -- Supabase の SQL Editor で一度だけ実行してください。
 create table if not exists public.app_state (
@@ -28,4 +27,3 @@ on conflict (id) do nothing;
 
 -- 注意：これは短期テスト用です。URLを知る人が同じ共有データを操作できます。
 -- 本番移行時は Supabase Auth を追加し、authenticated ロール限定へ変更します。
-
