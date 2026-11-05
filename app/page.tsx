@@ -10,6 +10,7 @@ type Receipt={id:number;batchId:string;orderId:number;quantity:number;allocation
 type ChangeLog={id:number;targetId:string;kind:string;detail:string;actorName:string;createdAt:string};
 type Staff={id:number;staffCode:string;name:string;department:string;active:boolean};
 type Store={orders:Order[];receipts:Receipt[];locations:string[];logs:ChangeLog[];importedFiles:string[];staff:Staff[]};
+type TestData={version:string;orders:Order[];locations:string[];staff:Staff[]};
 type CsvRow=Omit<Order,"id"|"updatedAt">;
 type Draft={quantity:number;allocations:Allocation[]};
 type Filters={supplier:string;itemCode:string;itemName:string};
@@ -17,6 +18,7 @@ type Filters={supplier:string;itemCode:string;itemName:string};
 declare global{interface Window{SUPABASE_CONFIG?:{url?:string;anonKey?:string}}}
 
 const STORE_KEY="receiving-management-prototype-v3";
+const TEST_DATA_VERSION_KEY="receiving-management-test-data-version";
 const PUBLIC_URL="https://akaminerin.github.io/receiving-management-prototype/";
 const nowIso=()=>new Date().toISOString();
 const seedOrders:Order[]=[
@@ -40,6 +42,8 @@ const cloudEnabled=()=>{const {url,anonKey}=cloudConfig();return Boolean(url&&an
 const cloudHeaders=()=>{const {anonKey}=cloudConfig();return{'Content-Type':'application/json',apikey:anonKey,Authorization:`Bearer ${anonKey}`}};
 const readCloudStore=async():Promise<Store|null>=>{if(!cloudEnabled())return null;const {url}=cloudConfig();const response=await fetch(`${url}/rest/v1/app_state?id=eq.main&select=data`,{headers:cloudHeaders()});if(!response.ok)throw new Error(`共有DB読込エラー (${response.status})`);const rows=await response.json();return rows[0]?.data?{...emptyStore(),...rows[0].data}:null};
 const saveCloudStore=async(s:Store)=>{if(!cloudEnabled())return;const {url}=cloudConfig();const response=await fetch(`${url}/rest/v1/app_state`,{method:'POST',headers:{...cloudHeaders(),Prefer:'resolution=merge-duplicates'},body:JSON.stringify({id:'main',data:s,updated_at:nowIso()})});if(!response.ok)throw new Error(`共有DB保存エラー (${response.status})`)};
+const loadTestData=async()=>{const response=await fetch('./test-data.json',{cache:'no-cache'});if(!response.ok)throw new Error('テストデータを取得できません');return await response.json() as TestData};
+const mergeTestData=(base:Store,data:TestData):Store=>{const s=structuredClone(base) as Store;s.staff=s.staff.filter(x=>!(x.staffCode==='S001'&&x.name==='プロトタイプ利用者'));const orderKeys=new Set(s.orders.map(x=>`${x.orderNumber}:${x.itemCode}`)),staffCodes=new Set(s.staff.map(x=>x.staffCode.toLowerCase())),locations=new Set(s.locations);for(const order of data.orders)if(!orderKeys.has(`${order.orderNumber}:${order.itemCode}`))s.orders.push(order);for(const staff of data.staff)if(!staffCodes.has(staff.staffCode.toLowerCase()))s.staff.push(staff);for(const location of data.locations)if(!locations.has(location))s.locations.push(location);return s};
 const fmt=(v:string)=>new Intl.DateTimeFormat("ja-JP",{dateStyle:"short",timeStyle:"short",timeZone:"Asia/Tokyo"}).format(new Date(v));
 const localDateTime=(iso=new Date().toISOString())=>{const d=new Date(iso);d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,16)};
 const normalized=(s:string)=>s.trim().toLowerCase();
@@ -55,7 +59,7 @@ export default function Home(){
  const [csvRows,setCsvRows]=useState<CsvRow[]>([]),[csvName,setCsvName]=useState(''),[locationInput,setLocationInput]=useState(''),[historyQuery,setHistoryQuery]=useState('');
  const [staffCode,setStaffCode]=useState(''),[staffName,setStaffName]=useState(''),[staffDepartment,setStaffDepartment]=useState('倉庫担当');
  const [editingReceipt,setEditingReceipt]=useState<Receipt|null>(null),[receiptAction,setReceiptAction]=useState<'delete'|'return'|''>(''),[receiptEditStep,setReceiptEditStep]=useState<'select'|'confirm'>('select');
- useEffect(()=>{let active=true;(async()=>{const local=readStore();try{const cloud=await readCloudStore();if(!active)return;if(cloud){saveStore(cloud);setStore(cloud)}else{setStore(local);if(cloudEnabled())await saveCloudStore(local)}setSyncState(cloudEnabled()?'cloud':'local')}catch{if(active){setStore(local);setSyncState('error')}}finally{if(active)setReady(true)}})();return()=>{active=false}},[]);
+ useEffect(()=>{let active=true;(async()=>{const local=readStore();let next=local;try{const cloud=await readCloudStore();if(!active)return;if(cloud)next=cloud;const testData=await loadTestData();if(localStorage.getItem(TEST_DATA_VERSION_KEY)!==testData.version){next=mergeTestData(next,testData);localStorage.setItem(TEST_DATA_VERSION_KEY,testData.version);if(cloudEnabled())await saveCloudStore(next)}saveStore(next);setStore(next);setReceiver(next.staff.find(s=>s.active)?.name||'プロトタイプ利用者');setSyncState(cloudEnabled()?'cloud':'local')}catch{if(active){setStore(next);setReceiver(next.staff.find(s=>s.active)?.name||'プロトタイプ利用者');setSyncState(cloudEnabled()?'error':'local')}}finally{if(active)setReady(true)}})();return()=>{active=false}},[]);
  const commit=(next:Store)=>{saveStore(next);setStore({...next});if(cloudEnabled()){setSyncState('cloud');void saveCloudStore(next).catch(()=>setSyncState('error'))}};
  const addStaff=()=>{const code=staffCode.trim(),name=staffName.trim(),department=staffDepartment.trim();if(!code||!name){setMessage('職員番号と氏名を入力してください。');return}if(store.staff.some(s=>s.staffCode.toLowerCase()===code.toLowerCase())){setMessage('同じ職員番号が登録済みです。');return}commit({...store,staff:[...store.staff,{id:Date.now(),staffCode:code,name,department:department||'未設定',active:true}]});setStaffCode('');setStaffName('');setStaffDepartment('倉庫担当');setMessage(`${name}さんを職員登録しました。`)};
  const toggleStaff=(id:number)=>{const target=store.staff.find(s=>s.id===id);if(!target)return;commit({...store,staff:store.staff.map(s=>s.id===id?{...s,active:!s.active}:s)});setMessage(`${target.name}さんを${target.active?'利用停止':'利用再開'}にしました。`)};
