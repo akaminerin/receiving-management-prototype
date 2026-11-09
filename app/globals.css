@@ -48,3 +48,35 @@
 .pdf-rendered-pages{padding:14px;max-height:560px;overflow:auto;background:#e8eef1}.pdf-rendered-pages figure{width:min(100%,900px);margin:0 auto 14px}.pdf-rendered-pages img{display:block;width:100%;height:auto;background:#fff;box-shadow:0 4px 18px #23374626}.pdf-rendered-pages figcaption{text-align:center;padding:7px;color:#607784;font-size:11px}.pdf-rendered-pages.all-pages{flex:1;min-height:0;max-height:none;border:1px solid #d8e2e7;border-radius:9px}.pdf-preview-modal>.pdf-preview-loading,.pdf-preview-modal>.pdf-preview-missing{flex:1;display:grid;place-items:center}.pdf-inline-preview>.pdf-rendered-pages{border-top:0}.pdf-inline-preview.stored>.pdf-rendered-pages{padding:10px}.ocr-product-display{grid-template-columns:1fr}
 @media(max-width:720px){.pdf-rendered-pages{padding:7px;max-height:460px}.pdf-rendered-pages.all-pages{max-height:none}.pdf-preview-modal>.pdf-rendered-pages{flex:1}}
 
+/* Mobile receiving form: keep every registration control inside the viewport. */
+.field,.item-entry,.item-entry-head>div,.allocation-row>*{min-width:0}.field input,.field select,.field textarea{display:block;width:100%;min-width:0;max-width:100%}.item-entry{max-width:100%}.item-entry h3,.item-entry p,.item-entry span,.confirm-items strong,.confirm-items span{overflow-wrap:anywhere}.pdf-selected>div{min-width:0}.pdf-selected strong{overflow-wrap:anywhere}
+@media(max-width:720px){
+  html,body,#root{max-width:100%;overflow-x:hidden}
+  .sidebar nav{grid-template-columns:repeat(7,minmax(0,1fr))}
+  .sidebar nav button{font-size:8px;letter-spacing:-.02em}
+  .item-entry{padding:14px 12px;border-radius:12px}
+  .item-entry-head{gap:12px}
+  .item-entry-head h3{font-size:17px}
+  .item-entry-head p{line-height:1.65}
+  .allocation-head{align-items:flex-start;flex-wrap:wrap;gap:8px}
+  .allocation-head span{font-size:11px}
+  .allocation-row{grid-template-columns:minmax(0,1fr) 82px 36px;gap:6px;align-items:end}
+  .allocation-row .field{margin-top:8px}
+  .allocation-row .field input{padding-left:8px;padding-right:8px}
+  .icon-btn{width:36px;padding:0}
+  .add-location{width:100%;justify-content:center}
+  .inline-actions{position:static;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:20px -14px -14px;padding:12px 14px;background:#fff;border-top:1px solid #dce5ea}
+  .inline-actions .ghost,.inline-actions .primary{width:100%;min-width:0;white-space:normal}
+  .confirm-banner{align-items:flex-start;padding:15px;min-width:0}
+  .confirm-banner svg{flex:none}
+  .confirm-items article{min-width:0;padding:13px}
+  .pdf-selected strong{font-size:12px}
+}
+@media(max-width:360px){
+  .content{padding-left:8px;padding-right:8px}
+  .panel{padding-left:10px;padding-right:10px}
+  .item-entry{padding:12px 9px}
+  .allocation-row{grid-template-columns:minmax(0,1fr) 72px 34px;gap:5px}
+  .inline-actions{margin-left:-10px;margin-right:-10px;padding-left:10px;padding-right:10px}
+}
+
